@@ -1,6 +1,7 @@
 const blogRouter = require('./router/blogRouter')
-// const userRouter = require('./router/userRouter')
+const userRouter = require('./router/userRouter')
 
+// 对client端传来的post数据做处理
 const getPostData = (req) => {
     return new Promise((resolve, reject) => {
         if (req.method !== 'POST') {
@@ -35,14 +36,22 @@ const serverHandle = (req, res) => {
 
     getPostData(req).then(body => {
         req.body = body
+
+        // 命中blog模块路由
         const blogResult = blogRouter(req, res)
         if (blogResult) {
             blogResult.then(data => res.end(
                 JSON.stringify(data)
             ))
         }
-    
-        // const userResult = userRouter(req, res)
+
+        // 命中user模块路由
+        const userResult = userRouter(req, res)
+        if (userResult) {
+            userResult.then(data => res.end(
+                JSON.stringify(data)
+            ))
+        }
     })
 
 
