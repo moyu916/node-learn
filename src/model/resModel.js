@@ -6,7 +6,7 @@ class BaseModel {
             data = null
             message = null
         }
-        if (data) {
+        if (data || typeof data === 'boolean') {
             this.data = data
         }
         if (message) {

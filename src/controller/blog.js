@@ -1,85 +1,64 @@
+const { exec } = require("../db/mysql")
+
 const getBlogList = (author, keyword) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const list = {
-                id: 1,
-                title: '这是一篇博客',
-                content: '这是博客的内容',
-                createTime: 1635819417620,
-                author: 'lqy'
-            }
-            resolve(list)
-        }, 1000)
-    })
+    let sql = `select * from blogs where 1=1 ` // 留意最后的空格
+    if (author) {
+        sql += `and author='${author}' `
+    }
+    if (keyword) {
+        sql += `and title like '%${keyword}' `
+    }
+    sql += `order by createtime desc;`
+
+    // console.log('sql', sql)
+    return exec(sql).then(listData => listData)
+                    .catch(err => err)
 }
 
 const getBlogDetail = (id) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const detail = {
-                id: 1,
-                title: '这是一篇博客',
-                content: '这是博客的内容',
-                createTime: 1635819417620,
-                author: 'lqy'
-            }
-            if (id === detail.id) {
-                resolve(detail)
-            } else {
-                reject('博客不存在')
-            }     
-        }, 1000)
-    })
+    let sql = `select title, content, createtime, author from blogs where id=${id};`
+    return exec(sql).then(rows => rows[0])
+                    .catch(err => err)
 }
 
 const newBlog = (blogData) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (Math.random() > 0.5) {
-                resolve('新增博客成功')
-            } else {
-                reject('新增博客失败')
-            }          
-        }, 1000)
-    })
+    const { title, content, author } = blogData
+    const createTime = Date.now()
+    let sql = `
+        insert into blogs (title, content, author, createtime)
+        values ('${title}', '${content}', '${author}', ${createTime});
+    `
+    return exec(sql).then(data => {
+        // console.log(data)
+        return {
+            id: data.insertId
+        }
+    }).catch(err => err)
 }
 
 const updateBlog = (id, data) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const detail = {
-                id: 1,
-                title: '这是一篇博客',
-                content: '这是博客的内容',
-                createTime: 1635819417620,
-                author: 'lqy'
-            }
-            if (id === detail.id) {
-                detail.content = data
-                resolve(`博客更新成功, 更新内容为${detail.content}`)
-            } else {
-                reject('博客不存在')
-            }     
-        }, 1000)
+    const { title, content } = data
+
+    const sql = `
+        update blogs set title='${title}', content='${content}' where id=${id};
+    `
+    return exec(sql).then(updateData => {
+        // console.log(updateData)
+        if (updateData.affectedRows > 0) {
+            return true
+        }
+        return false
     })
 }
 
 const delBlog = (id) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const detail = {
-                id: 1,
-                title: '这是一篇博客',
-                content: '这是博客的内容',
-                createTime: 1635819417620,
-                author: 'lqy'
-            }
-            if (id === detail.id) {
-                resolve('博客删除成功')
-            } else {
-                reject('博客删除失败')
-            }     
-        }, 1000)
+    let sql = `delete from blogs where id='${id}';`
+    return exec(sql).then(delData => {
+        // console.log(delData)
+        if (delData.affectedRows > 0) {
+            return true
+        }
+        return false
     })
 }
 
