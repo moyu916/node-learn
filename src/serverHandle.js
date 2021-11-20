@@ -17,7 +17,7 @@ const getPostData = (req) => {
             resolve({})
             return
         }
-        if (req.headers['content-type'] !== 'application/json') {
+        if (req.headers['content-type'].indexOf('application/json') === -1) {
             resolve({})
             return
         }
@@ -41,6 +41,17 @@ const serverHandle = (req, res) => {
     const { method, url } = req
 
     res.setHeader('Content-type', 'application/json')
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8001');
+    res.setHeader('Access-Control-Allow-Credentials', 'true'); // 允许服务器端发送Cookie数据
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Set-Cookie')
+
+    // 处理OPTIONS请求
+    if (method === 'OPTIONS') {
+        res.writeHead(200, {"Content-type": "text/plain"})
+        res.end()
+        return
+    }
 
     req.path = url.split('?')[0]
     req.query = new URLSearchParams(url.split('?')[1])
@@ -68,6 +79,7 @@ const serverHandle = (req, res) => {
     // 获取 session
     req.sessionId = userId // userId之前做过处理，这里一定能取到，并且redis中已经有这个id了
     get(req.sessionId).then(sessionData => {
+        // console.log('session', sessionData)
         if (sessionData == null) {
             set(req.sessionId, {})
             res.session = {}
@@ -78,11 +90,13 @@ const serverHandle = (req, res) => {
     })
     .then(body => {
         req.body = body
+        // console.log('body', body)
 
         // 命中blog模块路由
         const blogResult = blogRouter(req, res)
         if (blogResult) {
             blogResult.then(data => {
+                // console.log('d', data)
                 if (needSetCookie) {
                     res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
                 }
@@ -95,8 +109,11 @@ const serverHandle = (req, res) => {
 
         // 命中user模块路由
         const userResult = userRouter(req, res)
+        // console.log('userResult', userResult)
         if (userResult) {
             userResult.then(data => {
+                // console.log('d', data)
+                // console.log('need', needSetCookie)
                 if (needSetCookie) {
                     res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
                 }
@@ -106,6 +123,7 @@ const serverHandle = (req, res) => {
             })
             return
         }
+
 
         // 未命中路由，返回404
         res.writeHead(404, {"Content-type": "text/plain"})

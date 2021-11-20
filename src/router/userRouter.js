@@ -1,4 +1,4 @@
-const { set } = require('lodash')
+const { set, get } = require('../db/redis')
 const { userLogin } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
