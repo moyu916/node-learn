@@ -1,6 +1,7 @@
 const { get, set } = require('./db/redis')
 const blogRouter = require('./router/blogRouter')
 const userRouter = require('./router/userRouter')
+const { access } = require('./utils/log')
 
 // 获取 cookie 的过期时间
 const getCookieExpires = () => {
@@ -38,9 +39,13 @@ const getPostData = (req) => {
 }
 
 const serverHandle = (req, res) => {
+    // 记录access log
+    access(`${req.method} -- ${req.url} -- ${req.headers['user-agent']} -- ${Date.now()}`)
+
     const { method, url } = req
 
     res.setHeader('Content-type', 'application/json')
+
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8001');
     res.setHeader('Access-Control-Allow-Credentials', 'true'); // 允许服务器端发送Cookie数据
     res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS,DELETE');
