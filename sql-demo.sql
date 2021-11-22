@@ -14,6 +14,9 @@ select id, username from users
     
 update users set `password`='789' where username='zhangergou';
 
+update users set `password`='524ab85686df0e52ada43b11b53cce35' where username='lisi';
+update users set `password`='77514e17a05943705bbf0299b29db7d4' where username='zhangsan';
+
 -- 软删除, 一般不会用delete直接删, 而是通过设置state
 update users set state=0 where username='zhangergou';
 

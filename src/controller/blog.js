@@ -1,4 +1,5 @@
 const { exec } = require("../db/mysql")
+const xss = require('xss')
 
 const getBlogList = (author, keyword) => {
     let sql = `select * from blogs where 1=1 ` // 留意最后的空格
@@ -22,7 +23,9 @@ const getBlogDetail = (id) => {
 }
 
 const newBlog = (blogData) => {
-    const { title, content, author } = blogData
+    let { title, content, author } = blogData
+    title = xss(title)
+
     const createTime = Date.now()
     let sql = `
         insert into blogs (title, content, author, createtime)
