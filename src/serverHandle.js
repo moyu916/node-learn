@@ -44,7 +44,7 @@ const serverHandle = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8001');
     res.setHeader('Access-Control-Allow-Credentials', 'true'); // 允许服务器端发送Cookie数据
     res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS,DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Set-Cookie')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
     // 处理OPTIONS请求
     if (method === 'OPTIONS') {
@@ -79,7 +79,6 @@ const serverHandle = (req, res) => {
     // 获取 session
     req.sessionId = userId // userId之前做过处理，这里一定能取到，并且redis中已经有这个id了
     get(req.sessionId).then(sessionData => {
-        // console.log('session', sessionData)
         if (sessionData == null) {
             set(req.sessionId, {})
             res.session = {}

@@ -1,5 +1,4 @@
 use myblog;
-
 -- show tables; 
 
 insert into users(username, `password`, realname) values ('lisi', '123', '李四');

@@ -9,7 +9,7 @@ const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 // 统一的登录验证函数
 const loginCheck = (req) => {
-    if (!req.session.username) {
+    if (!req.session.username) { // 管理员模式，只判断有没有username，没判断是否一致
         return Promise.resolve(
             new ErrorModel('尚未登录')
         )
